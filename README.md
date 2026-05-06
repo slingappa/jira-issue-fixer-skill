@@ -55,7 +55,7 @@ Optional destination:
 ./install.sh --dest /path/to/skills --force
 ```
 
-## Recommended prompt template
+## Recommended prompt template (final)
 
 ```text
 Use $jira-issue-fixer-next and run fully unattended end-to-end unless a mandatory gating input is missing.
@@ -74,6 +74,9 @@ Build script:
 
 Runtime command:
 <EXACT_RUNTIME_COMMAND>
+
+Optional checker command:
+<CHECKER_CMD_IF_NON_STANDARD>
 
 Optional extra paths:
 - Artifact/runtime paths not embedded in command:
@@ -100,6 +103,7 @@ Constraints and required behavior:
   - post-log must not contain failure signature
 - Confirm positive boot progression in post-fix logs.
 - Resolve checker automatically for known repos; if unresolved, ask before check-in.
+- If checker command is provided, use it instead of auto-detection.
 - Run checker and pass before check-in.
 - Create clean commit with Problem/Root cause/Fix and Signed-off-by.
 - Keep temporary diagnostics out of final fix commit.
