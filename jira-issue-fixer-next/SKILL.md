@@ -13,8 +13,11 @@ Collect these before implementation:
 4. Runtime command used for repro
 5. Exact numbered repro sequence
 6. Expected vs observed behavior
+7. Optional: checker command if repo uses non-standard patch checker
 
-If any are missing, ask explicitly.
+If checker is not provided:
+- Try auto-detection with `scripts/detect_checkpatch_cmd.sh`.
+- If detection fails, ask user before check-in/commit.
 
 ## Workflow
 
@@ -52,7 +55,12 @@ If any are missing, ask explicitly.
 - Keep commit focused to minimal files.
 - Include problem/root-cause/fix in commit message.
 - Include Signed-off-by when required.
-- Run patch checker (`scripts/patchcheck_wrapper.sh` for edk2-like trees).
+- Resolve checker command before check-in:
+  - use user-provided checker, else auto-detect with `scripts/detect_checkpatch_cmd.sh`.
+  - if unresolved, ask user and do not check in.
+- Run checker after validation and before check-in:
+  - use `scripts/patchcheck_wrapper.sh` for edk2-like repos.
+  - use detected checker command for other known repos (Linux/U-Boot/Zephyr).
 
 ## Output Contract
 Return:
@@ -72,4 +80,5 @@ Return:
 - Repro automation wrapper: [scripts/run_repro_menu_boot.sh](scripts/run_repro_menu_boot.sh)
 - Interactive expect flow: [scripts/repro_menu_boot.expect](scripts/repro_menu_boot.expect)
 - Before/after signature check: [scripts/repro_before_after_check.sh](scripts/repro_before_after_check.sh)
+- Checker auto-detect: [scripts/detect_checkpatch_cmd.sh](scripts/detect_checkpatch_cmd.sh)
 - PatchCheck helper: [scripts/patchcheck_wrapper.sh](scripts/patchcheck_wrapper.sh)

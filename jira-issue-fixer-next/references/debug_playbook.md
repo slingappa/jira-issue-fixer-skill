@@ -35,4 +35,8 @@
 - One focused commit per logical fix.
 - Message sections: Problem / Root cause / Fix.
 - Include Signed-off-by when policy requires.
-- Run patch checker and report outcome.
+- Resolve checker command before check-in:
+  - prefer user-provided checker command.
+  - else auto-detect for known repos (Linux, edk2, U-Boot, Zephyr).
+  - if still unresolved, ask user and block check-in.
+- Run patch checker and report outcome before check-in.

@@ -23,6 +23,7 @@ The skill guides end-to-end Jira issue execution for local codebases:
 - `jira-issue-fixer-next/scripts/run_repro_menu_boot.sh`: wrapper for interactive repro automation
 - `jira-issue-fixer-next/scripts/repro_menu_boot.expect`: expect automation template
 - `jira-issue-fixer-next/scripts/repro_before_after_check.sh`: verify pre-fix failure exists and post-fix failure is gone
+- `jira-issue-fixer-next/scripts/detect_checkpatch_cmd.sh`: detect checker command for known repos
 - `jira-issue-fixer-next/scripts/patchcheck_wrapper.sh`: helper for edk2 PatchCheck usage
 
 ## Clone
@@ -63,8 +64,12 @@ Repos: <ABS_PATHS>
 Build script: <ABS_PATH>
 Run command: <EXACT_RUNTIME_CMD>
 Repro steps: <NUMBERED_STEPS>
+Checker: <OPTIONAL_CHECKER_CMD_IF_NON_STANDARD>
 Capture `session.log` and `timing.log` using script --timing before automation.
 Capture post-fix `session.log` and `timing.log` with same sequence and prove failure signature is gone.
 Reproduce first, automate repro, isolate root cause with minimal instrumentation,
 implement minimal fix, validate with same repro path, and commit cleanly.
 ```
+
+If checker is not provided, the skill auto-detects for known repos (Linux, edk2,
+U-Boot, Zephyr). If still unresolved, it should ask before check-in/commit.
