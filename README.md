@@ -13,6 +13,7 @@ Many issue-fixing attempts fail because they skip one of these:
 - pre-fix trace evidence,
 - same-path post-fix validation,
 - clean commit gates.
+- multi-run stability proof.
 
 This skill enforces all four.
 
@@ -28,6 +29,8 @@ When used correctly, the skill enforces:
 7. Agent commits omit `Signed-off-by`; user adds signoff after explicit final testing.
 8. Fix decisions are evidence-driven from current traces; no dependency on any
    known-good historical patch.
+9. Two-pass trace gate + hypothesis matrix must be completed before coding.
+10. Pre/post reproducibility rates are measured (not guessed).
 
 ## What you need to provide
 
@@ -82,10 +85,14 @@ git config alias.cs "commit -s"
 - `jira-issue-fixer-next/SKILL.md`
 - `jira-issue-fixer-next/agents/openai.yaml`
 - `jira-issue-fixer-next/references/debug_playbook.md`
+- `jira-issue-fixer-next/references/hypothesis_matrix_template.md`
 - `jira-issue-fixer-next/scripts/capture_repro_session.sh`
 - `jira-issue-fixer-next/scripts/run_repro_menu_boot.sh`
 - `jira-issue-fixer-next/scripts/repro_menu_boot.expect`
 - `jira-issue-fixer-next/scripts/repro_before_after_check.sh`
+- `jira-issue-fixer-next/scripts/repro_stability_check.sh`
+- `jira-issue-fixer-next/scripts/capture_state_diff.sh`
+- `jira-issue-fixer-next/scripts/quality_gate_report.sh`
 - `jira-issue-fixer-next/scripts/detect_checkpatch_cmd.sh`
 - `jira-issue-fixer-next/scripts/patchcheck_wrapper.sh`
 
@@ -125,12 +132,17 @@ Mandatory behavior:
 - Read full Jira content first (description, repro, comments, attachments) and use it to drive repro/tracing.
 - Create a dedicated local working branch before any debug/edit.
 - Capture pre-fix failing run logs (session.log, timing.log for interactive flows).
+- Run at least 3 pre-fix reproductions and record fail rate (target >= 0.67).
+- Build a 3-hypothesis matrix and falsify non-winning hypotheses before code changes.
 - Add pre-fix tracing and identify exact failing function/path + reject reason.
+- Enforce two-pass tracing (broad path map, then exact reject-branch proof).
 - Do not implement behavior change before trace evidence is captured.
 - Do not assume a known-good historical fix exists; derive fix from current
   code + trace evidence only.
 - Implement minimal safe fix only.
 - Capture post-fix logs using the same sequence.
+- Run at least 3 post-fix reproductions and record fail rate (target == 0.00).
+- Capture state diff artifacts around trigger sequence when possible.
 - Prove failure signature exists pre-fix and is absent post-fix.
 - Resolve checker (provided or auto-detected), run checker, and pass before check-in.
 - Omit Signed-off-by in agent commit; I will do final test/signoff and add Signed-off-by myself.
@@ -142,7 +154,8 @@ Final report must include:
 3) Files changed
 4) Pre/post log paths and signature check result
 5) Build/checker validation result
-6) Final commit hash
+6) Quality gate score + ready/not-ready flag
+7) Final commit hash
 ```
 
 ## Checker auto-detection (if checker not provided)
@@ -169,7 +182,7 @@ If not detected, the skill must ask before check-in.
   - Fix: provide explicit checker command in prompt.
 
 - Problem: post-fix still fails intermittently.
-  - Fix: tune automation timing/menu offsets and re-capture pre/post logs.
+  - Fix: tune automation timing/menu offsets and enforce stability thresholds with `repro_stability_check.sh`.
 
 - Problem: trace output not visible.
   - Fix: use serial-visible markers and rerun pre-fix traced capture.

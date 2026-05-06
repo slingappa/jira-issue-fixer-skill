@@ -29,12 +29,23 @@
 - Start with user-provided keysteps; tune menu offsets only as needed.
 - Parameterize key counts and timing via env vars.
 - Keep logs in one stable location for grep-based signature checks.
+- Run multi-attempt stability checks before coding:
+  - `scripts/repro_stability_check.sh --runs 3 --expect fail`
+  - target pre-fix failure rate >= 0.67.
 
 ## C. Instrumentation Ladder
 Trace gate:
 - No behavior change until trace evidence identifies the exact failing branch.
 - Pre-fix tracing is mandatory and must be captured from a failing run.
 - Prefer branch-specific tags so reject reason is unambiguous.
+- Enforce two-pass tracing:
+  - pass 1 maps broad path,
+  - pass 2 isolates exact reject branch and condition.
+- Build a 3-hypothesis matrix and falsify non-winning branches before patching.
+- Capture state diffs around trigger sequence when possible:
+  - memory descriptors/map changes,
+  - boot variables/device handles.
+  - script helper: `scripts/capture_state_diff.sh`.
 
 1. Add branch tags around suspected reject paths.
 2. If DEBUG output is hidden, use serial writes.
@@ -52,10 +63,24 @@ Trace gate:
 - Same failing sequence must now pass.
 - Signature must disappear from logs.
 - Positive path must continue (boot progression observed).
+- Run post-fix stability checks:
+  - `scripts/repro_stability_check.sh --runs 3 --expect pass`
+  - target post-fix failure rate == 0.00.
+- Include negative-path regressions:
+  - direct-success path,
+  - shell-enter/exit path,
+  - unrelated boot option.
 
 ## F. Commit Standards
 - One focused commit per logical fix.
-- Message sections: Problem / Root cause / Fix.
+- Message sections:
+  - Problem
+  - Trigger Sequence
+  - Trace Evidence
+  - Root Cause
+  - Fix
+  - Validation
+  - Risk
 - Do not add `Signed-off-by` in agent-created commits.
 - User performs final explicit test/signoff and adds signoff themselves.
 - Resolve checker command before check-in:
@@ -63,3 +88,6 @@ Trace gate:
   - else auto-detect for known repos (Linux, edk2, U-Boot, Zephyr).
   - if still unresolved, ask user and block check-in.
 - Run patch checker and report outcome before check-in.
+- Produce quality score and readiness flag:
+  - `scripts/quality_gate_report.sh`
+  - include score + ready/not-ready in final report.

@@ -57,21 +57,33 @@ If checker is not provided:
 - This pre-fix capture is mandatory: it must contain the failure signature.
 - For interactive flows, immediately automate with `scripts/repro_menu_boot.expect` + wrapper.
 - Ensure deterministic pass/fail exit code and log file.
+- **MANDATORY reproducibility scoring (pre-fix)**:
+  - run the same failing sequence at least 3 times with
+    `scripts/repro_stability_check.sh`,
+  - require pre-fix failure rate >= 0.67 before coding.
 
 4. **Isolate root cause**
 - **MANDATORY pre-fix instrumentation tracing**:
   - add trace markers before any functional code change,
   - run failing sequence with tracing enabled,
   - capture pre-fix trace evidence from logs/serial output.
+- **Two-pass trace gate (mandatory)**:
+  - pass 1: broad trace map over candidate path,
+  - pass 2: narrow trace proving exact reject branch and condition.
 - Trace-first gate (mandatory): do not implement a fix until trace evidence
   identifies the exact failing branch/path.
 - Start with narrow, high-signal instrumentation.
 - Prefer serial-visible markers if DEBUG output may be suppressed.
 - Place markers at decision branches, not broad spam logging.
+- Build a mandatory hypothesis matrix (minimum 3 hypotheses) and falsify
+  non-winning hypotheses before implementing the fix:
+  `references/hypothesis_matrix_template.md`.
 - Capture and report:
   - the failing function/path,
   - the exact reject branch/reason from trace markers,
   - why this branch explains the user-visible failure.
+- Capture state diffs around trigger sequence when possible (memory map/boot
+  vars/device handles) using `scripts/capture_state_diff.sh`.
 
 5. **Implement minimal safe fix**
 - Fix root cause only; avoid opportunistic refactors.
@@ -79,6 +91,8 @@ If checker is not provided:
 - Keep temporary diagnostics out of final fix unless user asks.
 - Do not rely on known-good historical patches; derive the fix from current
   trace evidence in this codebase.
+- Keep patch minimal; if change spans multiple functions/files, justify why
+  narrower fix is unsafe/incomplete.
 
 6. **Validate**
 - Rebuild with authoritative user build script.
@@ -86,10 +100,18 @@ If checker is not provided:
 - Confirm pre-fix logs contain the failure signature and post-fix logs do not.
 - Confirm expected boot path continues in post-fix logs.
 - Use `scripts/repro_before_after_check.sh` for signature verification.
+- **MANDATORY reproducibility scoring (post-fix)**:
+  - run same sequence at least 3 times with `scripts/repro_stability_check.sh`,
+  - require post-fix failure rate == 0.00.
+- Run negative-path regression checks:
+  - direct-success path still succeeds,
+  - shell-enter/exit path succeeds,
+  - at least one unrelated boot option still behaves.
 
 7. **Commit hygiene**
 - Keep commit focused to minimal files.
-- Include problem/root-cause/fix in commit message.
+- Include Problem/Trigger Sequence/Trace Evidence/Root Cause/Fix/Validation/Risk
+  sections in commit message.
 - Mandatory signoff rule:
   - do not add `Signed-off-by` in agent-created commits.
   - user must explicitly run their own final test/signoff flow and add signoff.
@@ -105,19 +127,27 @@ Return:
 1. Repro evidence (before/after)
 2. Pre-fix trace evidence summary (function/path + reject reason)
 3. Root cause statement tied to trace evidence
-4. Exact files changed
-5. Validation evidence
-6. Paths to pre-fix and post-fix `session.log`/`timing.log`
-7. Explicit signature check result (pre contains failure, post does not)
-8. Commit hash + patch-check result
+4. Hypothesis matrix result (winner + falsified alternatives)
+5. Exact files changed (and why minimal)
+6. Validation evidence
+7. Paths to pre-fix and post-fix `session.log`/`timing.log`
+8. Explicit signature check result (pre contains failure, post does not)
+9. Pre/post reproducibility rates (N runs each)
+10. State-diff artifacts (if captured) and interpretation
+11. Commit hash + patch-check result
+12. Quality gate score from `scripts/quality_gate_report.sh` with ready/not-ready
 
 ## References
 - Detailed playbook: [references/debug_playbook.md](references/debug_playbook.md)
+- Hypothesis matrix template: [references/hypothesis_matrix_template.md](references/hypothesis_matrix_template.md)
 
 ## Scripts
 - Repro capture helper: [scripts/capture_repro_session.sh](scripts/capture_repro_session.sh)
 - Repro automation wrapper: [scripts/run_repro_menu_boot.sh](scripts/run_repro_menu_boot.sh)
 - Interactive expect flow: [scripts/repro_menu_boot.expect](scripts/repro_menu_boot.expect)
 - Before/after signature check: [scripts/repro_before_after_check.sh](scripts/repro_before_after_check.sh)
+- Repro stability scoring: [scripts/repro_stability_check.sh](scripts/repro_stability_check.sh)
+- State diff capture: [scripts/capture_state_diff.sh](scripts/capture_state_diff.sh)
+- Quality score report: [scripts/quality_gate_report.sh](scripts/quality_gate_report.sh)
 - Checker auto-detect: [scripts/detect_checkpatch_cmd.sh](scripts/detect_checkpatch_cmd.sh)
 - PatchCheck helper: [scripts/patchcheck_wrapper.sh](scripts/patchcheck_wrapper.sh)
