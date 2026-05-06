@@ -27,6 +27,7 @@ If any are missing, ask explicitly.
 - Reproduce manually once with user-provided sequence.
 - For interactive flows, first capture `session.log` and `timing.log` using
   `script --timing` (use `scripts/capture_repro_session.sh`).
+- This pre-fix capture is mandatory: it must contain the failure signature.
 - For interactive flows, immediately automate with `scripts/repro_menu_boot.expect` + wrapper.
 - Ensure deterministic pass/fail exit code and log file.
 
@@ -42,8 +43,10 @@ If any are missing, ask explicitly.
 
 5. **Validate**
 - Rebuild with authoritative user build script.
-- Re-run same scripted repro path.
-- Confirm failure signature is gone and expected boot path continues.
+- Re-run the same scripted repro path and capture a post-fix `session.log`/`timing.log`.
+- Confirm pre-fix logs contain the failure signature and post-fix logs do not.
+- Confirm expected boot path continues in post-fix logs.
+- Use `scripts/repro_before_after_check.sh` for signature verification.
 
 6. **Commit hygiene**
 - Keep commit focused to minimal files.
@@ -57,8 +60,9 @@ Return:
 2. Root cause statement
 3. Exact files changed
 4. Validation evidence
-5. Paths to captured `session.log` and `timing.log` (for interactive repro)
-6. Commit hash + patch-check result
+5. Paths to pre-fix and post-fix `session.log`/`timing.log`
+6. Explicit signature check result (pre contains failure, post does not)
+7. Commit hash + patch-check result
 
 ## References
 - Detailed playbook: [references/debug_playbook.md](references/debug_playbook.md)
@@ -67,4 +71,5 @@ Return:
 - Repro capture helper: [scripts/capture_repro_session.sh](scripts/capture_repro_session.sh)
 - Repro automation wrapper: [scripts/run_repro_menu_boot.sh](scripts/run_repro_menu_boot.sh)
 - Interactive expect flow: [scripts/repro_menu_boot.expect](scripts/repro_menu_boot.expect)
+- Before/after signature check: [scripts/repro_before_after_check.sh](scripts/repro_before_after_check.sh)
 - PatchCheck helper: [scripts/patchcheck_wrapper.sh](scripts/patchcheck_wrapper.sh)

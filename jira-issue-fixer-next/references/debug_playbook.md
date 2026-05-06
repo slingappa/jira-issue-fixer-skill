@@ -25,6 +25,8 @@
 - Keep change set minimal and reviewable.
 
 ## E. Validation Bar
+- Capture pre-fix logs and confirm failure signature exists.
+- Capture post-fix logs with the same sequence and confirm failure signature is absent.
 - Same failing sequence must now pass.
 - Signature must disappear from logs.
 - Positive path must continue (boot progression observed).
