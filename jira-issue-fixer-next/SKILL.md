@@ -71,7 +71,9 @@ If checker is not provided:
 6. **Commit hygiene**
 - Keep commit focused to minimal files.
 - Include problem/root-cause/fix in commit message.
-- Include Signed-off-by when required.
+- Mandatory signoff rule:
+  - do not add `Signed-off-by` in agent-created commits.
+  - user must explicitly run their own final test/signoff flow and add signoff.
 - Resolve checker command before check-in:
   - use user-provided checker, else auto-detect with `scripts/detect_checkpatch_cmd.sh`.
   - if unresolved, ask user and do not check in.

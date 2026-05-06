@@ -108,7 +108,8 @@ Constraints and required behavior:
 - Resolve checker automatically for known repos; if unresolved, ask before check-in.
 - If checker command is provided, use it instead of auto-detection.
 - Run checker and pass before check-in.
-- Create clean commit with Problem/Root cause/Fix and Signed-off-by.
+- Create clean commit with Problem/Root cause/Fix (omit Signed-off-by).
+- User should explicitly run final test/signoff and add Signed-off-by themselves.
 - Keep temporary diagnostics out of final fix commit.
 - Do not modify unrelated files.
 - Treat provided commands/paths as authoritative; ask for path clarification only if missing/ambiguous.

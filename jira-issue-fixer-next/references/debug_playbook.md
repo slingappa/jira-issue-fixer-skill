@@ -40,7 +40,8 @@ Trace gate:
 ## F. Commit Standards
 - One focused commit per logical fix.
 - Message sections: Problem / Root cause / Fix.
-- Include Signed-off-by when policy requires.
+- Do not add `Signed-off-by` in agent-created commits.
+- User performs final explicit test/signoff and adds signoff themselves.
 - Resolve checker command before check-in:
   - prefer user-provided checker command.
   - else auto-detect for known repos (Linux, edk2, U-Boot, Zephyr).
