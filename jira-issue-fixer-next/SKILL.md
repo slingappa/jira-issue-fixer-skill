@@ -74,6 +74,7 @@ If checker is not provided:
     `scripts/repro_stability_check.sh`,
   - require pre-fix failure rate >= 0.67 before coding.
   - enforce per-run timeout (`--run-timeout-sec`) so unattended runs cannot hang.
+  - keep heartbeat enabled (`--heartbeat-sec`) so long runs show progress.
   - use robust signature matching for wrapped terminal output (`--match-mode both`).
 
 4. **Isolate root cause**
@@ -118,6 +119,7 @@ If checker is not provided:
   - run same sequence at least 3 times with `scripts/repro_stability_check.sh`,
   - require post-fix failure rate == 0.00.
   - keep per-run timeout enabled to prevent blocked sessions.
+  - keep heartbeat enabled for unattended visibility during long boot windows.
 - Run negative-path regression checks:
   - direct-success path still succeeds,
   - shell-enter/exit path succeeds,

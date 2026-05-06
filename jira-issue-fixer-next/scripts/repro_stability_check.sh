@@ -24,6 +24,7 @@ MIN_SUCCESS_RATE=""
 SUMMARY_FILE=""
 RUN_TIMEOUT_SEC="${RUN_TIMEOUT_SEC:-420}"
 MATCH_MODE="both"
+HEARTBEAT_SEC="${HEARTBEAT_SEC:-20}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -75,6 +76,10 @@ while [[ $# -gt 0 ]]; do
       MATCH_MODE="${2:-}"
       shift 2
       ;;
+    --heartbeat-sec)
+      HEARTBEAT_SEC="${2:-}"
+      shift 2
+      ;;
     -h|--help)
       cat <<USAGE
 Run repeated repro attempts and report fail/pass rates.
@@ -94,6 +99,7 @@ Optional:
   --summary-file <path>       Write key=value summary
   --run-timeout-sec <sec>     Per-run timeout (default: 420)
   --match-mode <line|normalized|both>
+  --heartbeat-sec <sec>       Progress heartbeat interval (default: 20)
 USAGE
       exit 0
       ;;
@@ -122,6 +128,10 @@ if ! [[ "$RUN_TIMEOUT_SEC" =~ ^[0-9]+$ ]] || [[ "$RUN_TIMEOUT_SEC" -lt 1 ]]; the
 fi
 if [[ "$MATCH_MODE" != "line" && "$MATCH_MODE" != "normalized" && "$MATCH_MODE" != "both" ]]; then
   echo "--match-mode must be line, normalized, or both" >&2
+  exit 1
+fi
+if ! [[ "$HEARTBEAT_SEC" =~ ^[0-9]+$ ]] || [[ "$HEARTBEAT_SEC" -lt 1 ]]; then
+  echo "--heartbeat-sec must be a positive integer" >&2
   exit 1
 fi
 
@@ -153,11 +163,35 @@ run_with_timeout() {
   local tsec="$1"
   local cmd="$2"
   local out_file="$3"
-  if command -v timeout >/dev/null 2>&1; then
-    timeout --foreground "${tsec}s" bash -lc "$cmd" >"$out_file" 2>&1
-  else
-    bash -lc "$cmd" >"$out_file" 2>&1
-  fi
+  local hb="$4"
+  local elapsed=0
+  local next_hb="$hb"
+  local rc=0
+
+  bash -lc "$cmd" >"$out_file" 2>&1 &
+  local pid=$!
+
+  while kill -0 "$pid" 2>/dev/null; do
+    sleep 1
+    elapsed=$((elapsed + 1))
+
+    if (( elapsed >= next_hb )); then
+      echo "  heartbeat: run still executing (${elapsed}s elapsed)"
+      next_hb=$((next_hb + hb))
+    fi
+
+    if (( elapsed >= tsec )); then
+      echo "  timeout: exceeded ${tsec}s, terminating run"
+      kill "$pid" 2>/dev/null || true
+      sleep 1
+      kill -9 "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      return 124
+    fi
+  done
+
+  wait "$pid" || rc=$?
+  return "$rc"
 }
 
 regex_match() {
@@ -190,9 +224,7 @@ echo "  expect    : $EXPECT_MODE"
 echo "  logs      : $LOG_DIR"
 echo "  timeout   : ${RUN_TIMEOUT_SEC}s"
 echo "  match     : $MATCH_MODE"
-if ! command -v timeout >/dev/null 2>&1; then
-  echo "  warn      : timeout command not found; per-run timeout not enforced"
-fi
+echo "  heartbeat : ${HEARTBEAT_SEC}s"
 
 for i in $(seq 1 "$RUNS"); do
   raw_log="$LOG_DIR/run_${i}.log"
@@ -202,7 +234,7 @@ for i in $(seq 1 "$RUNS"); do
   echo "[run $i/$RUNS] executing..."
 
   set +e
-  run_with_timeout "$RUN_TIMEOUT_SEC" "$RUN_CMD" "$raw_log"
+  run_with_timeout "$RUN_TIMEOUT_SEC" "$RUN_CMD" "$raw_log" "$HEARTBEAT_SEC"
   rc=$?
   set -e
 
