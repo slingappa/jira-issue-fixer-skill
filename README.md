@@ -4,6 +4,8 @@ Installable Codex skill bundle: `jira-issue-fixer-next`.
 
 This skill is built for Jira issues that require strict reproducibility, trace-first root-cause analysis, and safe commit hygiene.
 
+Expectation from this skill is with a well crafted prompt with detailed precise reproduction steps, build instructions, skill should be able to fix the issue unattended.
+
 ## Why this skill exists
 
 Many issue-fixing attempts fail because they skip one of these:
@@ -33,6 +35,10 @@ Minimum input:
 - build command/script
 - runtime command
 - exact failing sequence
+
+Important:
+- Include Jira issue details completely (description + comments).
+- Include attached logs/docs if available; these often contain better repro and tracing clues.
 
 Optional input:
 - checker command (if non-standard)
@@ -98,6 +104,7 @@ Exact failing sequence:
 N) <STEP_N>
 
 Mandatory behavior:
+- Read full Jira content first (description, repro, comments, attachments) and use it to drive repro/tracing.
 - Create a dedicated local working branch before any debug/edit.
 - Capture pre-fix failing run logs (session.log, timing.log for interactive flows).
 - Add pre-fix tracing and identify exact failing function/path + reject reason.

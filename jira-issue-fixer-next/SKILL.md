@@ -15,6 +15,8 @@ Collect these before implementation:
 6. Expected vs observed behavior
 7. Optional: checker command if repo uses non-standard patch checker
 8. Optional: extra artifact/runtime paths (if not already embedded in commands)
+9. Optional but strongly recommended: Jira attachments/logs/docs
+10. Optional but strongly recommended: Jira comments with additional repro/debug hints
 
 ## Path Policy
 - Treat user-provided commands and paths as authoritative.
@@ -28,7 +30,18 @@ If checker is not provided:
 
 ## Workflow
 
-1. **Baseline and alignment**
+1. **Jira intake first (mandatory)**
+- Read the full Jira issue content before debugging:
+  - summary, description, acceptance criteria, environment notes,
+  - listed reproduction steps,
+  - comments/history (new repro hints often appear there).
+- Review attached artifacts (logs, screenshots, docs, trace files) and extract:
+  - failure signatures,
+  - alternate/updated repro steps,
+  - environment/runtime differences.
+- Use Jira evidence to refine reproduction and tracing plan before code changes.
+
+2. **Baseline and alignment**
 - **MANDATORY branch safety rule (pre-fix)**:
   - create/use a dedicated local working branch before any instrumentation,
     build, or code edits,
@@ -37,7 +50,7 @@ If checker is not provided:
 - Verify build output path used by runtime command.
 - Record the exact failure signature.
 
-2. **Reproduce first**
+3. **Reproduce first**
 - Reproduce manually once with user-provided sequence.
 - For interactive flows, first capture `session.log` and `timing.log` using
   `script --timing` (use `scripts/capture_repro_session.sh`).
@@ -45,7 +58,7 @@ If checker is not provided:
 - For interactive flows, immediately automate with `scripts/repro_menu_boot.expect` + wrapper.
 - Ensure deterministic pass/fail exit code and log file.
 
-3. **Isolate root cause**
+4. **Isolate root cause**
 - **MANDATORY pre-fix instrumentation tracing**:
   - add trace markers before any functional code change,
   - run failing sequence with tracing enabled,
@@ -60,19 +73,19 @@ If checker is not provided:
   - the exact reject branch/reason from trace markers,
   - why this branch explains the user-visible failure.
 
-4. **Implement minimal safe fix**
+5. **Implement minimal safe fix**
 - Fix root cause only; avoid opportunistic refactors.
 - Preserve behavior outside failing path.
 - Keep temporary diagnostics out of final fix unless user asks.
 
-5. **Validate**
+6. **Validate**
 - Rebuild with authoritative user build script.
 - Re-run the same scripted repro path and capture a post-fix `session.log`/`timing.log`.
 - Confirm pre-fix logs contain the failure signature and post-fix logs do not.
 - Confirm expected boot path continues in post-fix logs.
 - Use `scripts/repro_before_after_check.sh` for signature verification.
 
-6. **Commit hygiene**
+7. **Commit hygiene**
 - Keep commit focused to minimal files.
 - Include problem/root-cause/fix in commit message.
 - Mandatory signoff rule:

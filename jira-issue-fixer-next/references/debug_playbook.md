@@ -1,5 +1,17 @@
 # Debug Playbook (Interactive Firmware/Boot Issues)
 
+## 0. Jira Intake (Mandatory)
+- Read complete Jira issue content before touching code:
+  - summary/description,
+  - reproduction steps,
+  - comments/history,
+  - acceptance criteria.
+- Inspect Jira attachments (logs/docs/screenshots/traces) for:
+  - definitive failure signatures,
+  - updated reproduction details,
+  - environmental constraints.
+- Build the tracing plan from Jira evidence, not assumptions.
+
 ## A. Context Integrity
 - Create a dedicated local working branch before any debug/edit action.
 - Keep user's original branch untouched during skill execution.
