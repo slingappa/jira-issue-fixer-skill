@@ -17,6 +17,8 @@
 ## C. Instrumentation Ladder
 Trace gate:
 - No behavior change until trace evidence identifies the exact failing branch.
+- Pre-fix tracing is mandatory and must be captured from a failing run.
+- Prefer branch-specific tags so reject reason is unambiguous.
 
 1. Add branch tags around suspected reject paths.
 2. If DEBUG output is hidden, use serial writes.

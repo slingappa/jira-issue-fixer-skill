@@ -42,6 +42,10 @@ If checker is not provided:
 - Ensure deterministic pass/fail exit code and log file.
 
 3. **Isolate root cause**
+- **MANDATORY pre-fix instrumentation tracing**:
+  - add trace markers before any functional code change,
+  - run failing sequence with tracing enabled,
+  - capture pre-fix trace evidence from logs/serial output.
 - Trace-first gate (mandatory): do not implement a fix until trace evidence
   identifies the exact failing branch/path.
 - Start with narrow, high-signal instrumentation.
@@ -78,7 +82,7 @@ If checker is not provided:
 ## Output Contract
 Return:
 1. Repro evidence (before/after)
-2. Trace evidence summary (function/path + reject reason)
+2. Pre-fix trace evidence summary (function/path + reject reason)
 3. Root cause statement tied to trace evidence
 4. Exact files changed
 5. Validation evidence
