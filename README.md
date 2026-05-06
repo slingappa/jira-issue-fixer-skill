@@ -58,6 +58,22 @@ Custom install destination:
 ./install.sh --dest /path/to/skills --force
 ```
 
+## Commit policy for this repo
+
+This skill repository requires signoff lines in commit messages.
+
+Use:
+
+```bash
+git commit -s -m "<message>"
+```
+
+Optional convenience alias:
+
+```bash
+git config alias.cs "commit -s"
+```
+
 ## Repo layout
 
 - `install.sh`
