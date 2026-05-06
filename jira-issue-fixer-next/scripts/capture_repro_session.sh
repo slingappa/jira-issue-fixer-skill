@@ -34,8 +34,8 @@ Optional:
 
 Example:
   capture_repro_session.sh \
-    --cmd "cd ~/workspace/... && ./QEMU-x86_64-Ubuntu-24.04.AppImage ..." \
-    --out-dir ~/workspace/ts_ws_0.21.1-rc4/ventana-sw-0.21.1-rc4
+    --cmd "cd /abs/path/to/runtime && ./QEMU-or-target-binary <args>" \
+    --out-dir /abs/path/to/log-output-dir
 USAGE
       exit 0
       ;;
