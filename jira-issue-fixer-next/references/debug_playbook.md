@@ -15,9 +15,13 @@
 - Keep logs in one stable location for grep-based signature checks.
 
 ## C. Instrumentation Ladder
+Trace gate:
+- No behavior change until trace evidence identifies the exact failing branch.
+
 1. Add branch tags around suspected reject paths.
 2. If DEBUG output is hidden, use serial writes.
 3. Narrow to one branch reason before changing behavior.
+4. Record trace-to-failure mapping explicitly (branch -> user-visible error).
 
 ## D. Fix Strategy
 - Prefer preflight validation + existing execution path over large rewrites.

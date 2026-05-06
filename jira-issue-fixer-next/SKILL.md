@@ -42,9 +42,15 @@ If checker is not provided:
 - Ensure deterministic pass/fail exit code and log file.
 
 3. **Isolate root cause**
+- Trace-first gate (mandatory): do not implement a fix until trace evidence
+  identifies the exact failing branch/path.
 - Start with narrow, high-signal instrumentation.
 - Prefer serial-visible markers if DEBUG output may be suppressed.
 - Place markers at decision branches, not broad spam logging.
+- Capture and report:
+  - the failing function/path,
+  - the exact reject branch/reason from trace markers,
+  - why this branch explains the user-visible failure.
 
 4. **Implement minimal safe fix**
 - Fix root cause only; avoid opportunistic refactors.
@@ -72,12 +78,13 @@ If checker is not provided:
 ## Output Contract
 Return:
 1. Repro evidence (before/after)
-2. Root cause statement
-3. Exact files changed
-4. Validation evidence
-5. Paths to pre-fix and post-fix `session.log`/`timing.log`
-6. Explicit signature check result (pre contains failure, post does not)
-7. Commit hash + patch-check result
+2. Trace evidence summary (function/path + reject reason)
+3. Root cause statement tied to trace evidence
+4. Exact files changed
+5. Validation evidence
+6. Paths to pre-fix and post-fix `session.log`/`timing.log`
+7. Explicit signature check result (pre contains failure, post does not)
+8. Commit hash + patch-check result
 
 ## References
 - Detailed playbook: [references/debug_playbook.md](references/debug_playbook.md)

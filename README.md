@@ -95,6 +95,8 @@ Constraints and required behavior:
 - Reproduce failure in pre-fix logs (mandatory).
 - Automate repro sequence and keep it deterministic.
 - Isolate root cause with minimal instrumentation.
+- Trace-first gate: do not implement fix until trace markers identify the exact failing branch/path.
+- In final report, include trace evidence (failing function/path + reject reason) before root-cause statement.
 - Implement minimal safe fix only.
 - Rebuild using provided build script.
 - Capture post-fix logs with the exact same sequence.
@@ -112,8 +114,9 @@ Constraints and required behavior:
 
 Expected final output:
 1) Root-cause summary
-2) Files changed
-3) Pre/post log paths and signature-check results
-4) Validation/build/checker results
-5) Final commit hash
+2) Trace evidence summary (function/path + reject reason)
+3) Files changed
+4) Pre/post log paths and signature-check results
+5) Validation/build/checker results
+6) Final commit hash
 ```
