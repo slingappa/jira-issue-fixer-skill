@@ -10,6 +10,8 @@
 #   SHELL_MENU_DOWN (default 0)
 #   TARGET_MENU_DOWN (default 1)
 #   MENU_SETTLE_MS (default 1400)
+#   BOOT_PROMPT_TIMEOUT_SEC (default 120)
+#   FAIL_WINDOW_TIMEOUT_SEC (default 180)
 
 proc getenv_default {name def} {
   if {[info exists ::env($name)] && $::env($name) ne ""} {
@@ -25,7 +27,7 @@ proc send_down {count} {
   }
 }
 
-set timeout -1
+set timeout [expr {[getenv_default "BOOT_PROMPT_TIMEOUT_SEC" "120"] + 0}]
 set cmd [getenv_default "REPRO_CMD" ""]
 if {$cmd eq ""} {
   puts stderr "REPRO_CMD is empty"
@@ -81,9 +83,9 @@ send_down $target_down
 send -- "\r"
 puts "REPRO: selected target option"
 
-set timeout 180
+set timeout [expr {[getenv_default "FAIL_WINDOW_TIMEOUT_SEC" "180"] + 0}]
 expect {
-  -re {Memory starting at .*marked as free, but EFI would not allocate} {
+  -re {Memory starting at[\s\S]*marked as free, but EFI would not[\s\S]*allocate} {
     puts "REPRO: FAILURE signature observed"
     exit 10
   }

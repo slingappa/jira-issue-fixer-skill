@@ -73,6 +73,8 @@ If checker is not provided:
   - run the same failing sequence at least 3 times with
     `scripts/repro_stability_check.sh`,
   - require pre-fix failure rate >= 0.67 before coding.
+  - enforce per-run timeout (`--run-timeout-sec`) so unattended runs cannot hang.
+  - use robust signature matching for wrapped terminal output (`--match-mode both`).
 
 4. **Isolate root cause**
 - **MANDATORY pre-fix instrumentation tracing**:
@@ -115,6 +117,7 @@ If checker is not provided:
 - **MANDATORY reproducibility scoring (post-fix)**:
   - run same sequence at least 3 times with `scripts/repro_stability_check.sh`,
   - require post-fix failure rate == 0.00.
+  - keep per-run timeout enabled to prevent blocked sessions.
 - Run negative-path regression checks:
   - direct-success path still succeeds,
   - shell-enter/exit path succeeds,

@@ -165,6 +165,8 @@ Mandatory behavior:
 - Create a dedicated local working branch before any debug/edit.
 - Capture pre-fix failing run logs (session.log, timing.log for interactive flows).
 - Run at least 3 pre-fix reproductions and record fail rate (target >= 0.67).
+  - enforce per-run timeout to avoid unattended hangs.
+  - use robust matching mode for wrapped/split terminal signatures.
 - Build a 3-hypothesis matrix and falsify non-winning hypotheses before code changes.
 - Add pre-fix tracing and identify exact failing function/path + reject reason.
 - Enforce two-pass tracing (broad path map, then exact reject-branch proof).
@@ -174,6 +176,7 @@ Mandatory behavior:
 - Implement minimal safe fix only.
 - Capture post-fix logs using the same sequence.
 - Run at least 3 post-fix reproductions and record fail rate (target == 0.00).
+  - keep per-run timeout enabled.
 - Capture state diff artifacts around trigger sequence when possible.
 - Prove failure signature exists pre-fix and is absent post-fix.
 - Resolve checker (provided or auto-detected), run checker, and pass before check-in.
@@ -218,3 +221,9 @@ If not detected, the skill must ask before check-in.
 
 - Problem: trace output not visible.
   - Fix: use serial-visible markers and rerun pre-fix traced capture.
+
+- Problem: unattended run appears hung in stability loop.
+  - Fix: set `--run-timeout-sec` and ensure boot prompt/fail window timeouts are set (`BOOT_PROMPT_TIMEOUT_SEC`, `FAIL_WINDOW_TIMEOUT_SEC`).
+
+- Problem: failure regex misses split terminal lines.
+  - Fix: use `--match-mode both` and whitespace-tolerant regex.

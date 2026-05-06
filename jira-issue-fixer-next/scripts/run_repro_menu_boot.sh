@@ -6,6 +6,7 @@ set -euo pipefail
 #   REPRO_CMD
 # Optional:
 #   REPRO_LOG, BOOT_MENU_DOWN, SHELL_MENU_DOWN, TARGET_MENU_DOWN, MENU_SETTLE_MS
+#   BOOT_PROMPT_TIMEOUT_SEC, FAIL_WINDOW_TIMEOUT_SEC
 
 REPRO_LOG="${REPRO_LOG:-/tmp/repro-menu-boot.log}"
 mkdir -p "$(dirname "$REPRO_LOG")"
