@@ -77,6 +77,8 @@ If checker is not provided:
 - Fix root cause only; avoid opportunistic refactors.
 - Preserve behavior outside failing path.
 - Keep temporary diagnostics out of final fix unless user asks.
+- Do not rely on known-good historical patches; derive the fix from current
+  trace evidence in this codebase.
 
 6. **Validate**
 - Rebuild with authoritative user build script.

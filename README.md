@@ -26,6 +26,8 @@ When used correctly, the skill enforces:
 5. Post-fix run uses the same sequence and proves failure signature is gone.
 6. Checker runs and passes before check-in.
 7. Agent commits omit `Signed-off-by`; user adds signoff after explicit final testing.
+8. Fix decisions are evidence-driven from current traces; no dependency on any
+   known-good historical patch.
 
 ## What you need to provide
 
@@ -125,6 +127,8 @@ Mandatory behavior:
 - Capture pre-fix failing run logs (session.log, timing.log for interactive flows).
 - Add pre-fix tracing and identify exact failing function/path + reject reason.
 - Do not implement behavior change before trace evidence is captured.
+- Do not assume a known-good historical fix exists; derive fix from current
+  code + trace evidence only.
 - Implement minimal safe fix only.
 - Capture post-fix logs using the same sequence.
 - Prove failure signature exists pre-fix and is absent post-fix.

@@ -16,7 +16,9 @@
 - Create a dedicated local working branch before any debug/edit action.
 - Keep user's original branch untouched during skill execution.
 - Confirm the runtime image path and build output are the same file.
-- Confirm branch/reset state before assuming previous fixes exist.
+- Confirm branch/reset state and debug from the current codebase only.
+- Do not depend on known-good historical fixes; derive fix shape from current
+  trace evidence.
 - Confirm exact failing sequence and direct-success sequence.
 
 ## B. Repro Automation Strategy
