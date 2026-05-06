@@ -1,33 +1,58 @@
 # Jira Issue Fixer Skill
 
-This repo contains an installable Codex skill: `jira-issue-fixer-next`.
+Installable Codex skill bundle: `jira-issue-fixer-next`.
 
-The skill is for **end-to-end Jira debugging/fixing** in local repos.
-It is designed for issues that need strict reproduction, tracing, validation, and safe commits.
+This skill is built for Jira issues that require strict reproducibility, trace-first root-cause analysis, and safe commit hygiene.
 
-## Who this is for
+## Why this skill exists
 
-Use this if you want the agent to:
-- reproduce a Jira issue exactly,
-- collect pre-fix evidence,
-- identify root cause using tracing,
-- implement a minimal fix,
-- validate with the same repro sequence,
-- and prepare a clean commit.
+Many issue-fixing attempts fail because they skip one of these:
+- deterministic reproduction,
+- pre-fix trace evidence,
+- same-path post-fix validation,
+- clean commit gates.
 
-## What the skill enforces
+This skill enforces all four.
 
-The skill has hard gates (not optional):
-- Create a **dedicated local working branch first** (do not modify your current branch directly).
-- Capture **pre-fix** `session.log` and `timing.log` for interactive repro.
-- Do **pre-fix tracing** before any behavior change.
-- Do not implement fix until trace evidence identifies exact failing branch/path.
-- Capture **post-fix** logs using the same sequence.
-- Verify: pre-fix logs contain failure signature, post-fix logs do not.
-- Resolve checker command before check-in (user-provided or auto-detected).
-- Omit `Signed-off-by` in agent commits; user adds it after explicit final testing/signoff.
+## Core guarantees
 
-## Repo contents
+When used correctly, the skill enforces:
+1. Work starts on a dedicated local branch (current branch is preserved).
+2. Pre-fix failing run is captured (`session.log`, `timing.log` for interactive flows).
+3. Pre-fix tracing identifies the exact failing function/path and reject reason.
+4. No functional fix is implemented before trace evidence is captured.
+5. Post-fix run uses the same sequence and proves failure signature is gone.
+6. Checker runs and passes before check-in.
+7. Agent commits omit `Signed-off-by`; user adds signoff after explicit final testing.
+
+## What you need to provide
+
+Minimum input:
+- Jira URL/key
+- repo path(s)
+- build command/script
+- runtime command
+- exact failing sequence
+
+Optional input:
+- checker command (if non-standard)
+- extra artifact/runtime paths not embedded in commands
+- failure signature regex and success signature regex
+
+## Install
+
+```bash
+cd /path/to/jira-issue-fixer-skill
+./install.sh --force
+```
+
+Custom install destination:
+
+```bash
+./install.sh --dest /path/to/skills --force
+```
+
+## Repo layout
 
 - `install.sh`
 - `jira-issue-fixer-next/SKILL.md`
@@ -40,33 +65,10 @@ The skill has hard gates (not optional):
 - `jira-issue-fixer-next/scripts/detect_checkpatch_cmd.sh`
 - `jira-issue-fixer-next/scripts/patchcheck_wrapper.sh`
 
-## Install
-
-```bash
-cd /path/to/jira-issue-fixer-skill
-./install.sh --force
-```
-
-Install to a custom location:
-
-```bash
-./install.sh --dest /path/to/skills --force
-```
-
-## 60-second usage
-
-1. Give Jira URL/key.
-2. Give repo path(s).
-3. Give build command/script.
-4. Give exact runtime command.
-5. Give exact failing step sequence.
-6. (Optional) Give checker command if non-standard.
-7. Ask it to run unattended with trace-first gates.
-
 ## Recommended prompt (copy/paste)
 
 ```text
-Use $jira-issue-fixer-next and run fully unattended end-to-end unless a mandatory gating input is missing.
+Use $jira-issue-fixer-next and run unattended end-to-end unless a mandatory gate is missing.
 
 Jira:
 <JIRA_URL_OR_KEY>
@@ -95,31 +97,52 @@ Exact failing sequence:
 ...
 N) <STEP_N>
 
-Required behavior:
+Mandatory behavior:
 - Create a dedicated local working branch before any debug/edit.
-- Capture pre-fix session.log + timing.log for failing run.
-- Add pre-fix tracing and identify exact failing branch/path before any fix.
+- Capture pre-fix failing run logs (session.log, timing.log for interactive flows).
+- Add pre-fix tracing and identify exact failing function/path + reject reason.
+- Do not implement behavior change before trace evidence is captured.
 - Implement minimal safe fix only.
-- Capture post-fix session.log + timing.log with the same sequence.
+- Capture post-fix logs using the same sequence.
 - Prove failure signature exists pre-fix and is absent post-fix.
-- Resolve checker and pass checker before check-in.
-- Omit Signed-off-by in agent commit; I will test/sign off explicitly after.
+- Resolve checker (provided or auto-detected), run checker, and pass before check-in.
+- Omit Signed-off-by in agent commit; I will do final test/signoff and add Signed-off-by myself.
 - Do not modify unrelated files.
 
 Final report must include:
 1) Pre-fix trace evidence (function/path + reject reason)
-2) Root cause tied to trace evidence
+2) Root cause tied to that evidence
 3) Files changed
-4) Pre/post log paths + signature check result
+4) Pre/post log paths and signature check result
 5) Build/checker validation result
 6) Final commit hash
 ```
 
-## Notes
+## Checker auto-detection (if checker not provided)
 
-- Commands/paths in the prompt are treated as authoritative.
-- The skill only asks for missing/ambiguous paths.
-- For known repos, checker can be auto-detected:
-  - edk2: `python3 BaseTools/Scripts/PatchCheck.py`
-  - Linux/U-Boot: `./scripts/checkpatch.pl --no-tree`
-  - Zephyr: `python3 scripts/ci/check_compliance.py`
+The skill attempts to auto-detect for common repos:
+- edk2: `python3 BaseTools/Scripts/PatchCheck.py`
+- Linux/U-Boot: `./scripts/checkpatch.pl --no-tree`
+- Zephyr: `python3 scripts/ci/check_compliance.py`
+
+If not detected, the skill must ask before check-in.
+
+## Path handling policy
+
+- Provided commands/paths are treated as authoritative.
+- If commands already contain absolute paths, skill proceeds without re-asking.
+- Skill asks only when required paths are missing or ambiguous.
+
+## Quick troubleshooting
+
+- Problem: skill can’t reproduce issue.
+  - Fix: make runtime command and repro sequence more explicit (keys, menu labels, delays).
+
+- Problem: checker step is blocked.
+  - Fix: provide explicit checker command in prompt.
+
+- Problem: post-fix still fails intermittently.
+  - Fix: tune automation timing/menu offsets and re-capture pre/post logs.
+
+- Problem: trace output not visible.
+  - Fix: use serial-visible markers and rerun pre-fix traced capture.
