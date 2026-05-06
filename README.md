@@ -1,61 +1,69 @@
-# jira-issue-fixer skill repo
+# Jira Issue Fixer Skill
 
-This repository packages the `jira-issue-fixer-next` Codex skill as a standalone installable bundle.
+This repo contains an installable Codex skill: `jira-issue-fixer-next`.
 
-## What this skill does
+The skill is for **end-to-end Jira debugging/fixing** in local repos.
+It is designed for issues that need strict reproduction, tracing, validation, and safe commits.
 
-The skill guides end-to-end Jira issue execution for local codebases:
-1. Validate issue context and active build/runtime paths.
-2. Capture interactive repro evidence (`session.log` + `timing.log`) with `script --timing`.
-3. Reproduce failures deterministically (including interactive firmware/menu flows).
-4. Add targeted instrumentation to isolate root cause.
-5. Implement a minimal, safe fix.
-6. Rebuild and validate with the same failing sequence.
-7. Produce clean, patch-checkable commits.
+## Who this is for
 
-## Repository layout
+Use this if you want the agent to:
+- reproduce a Jira issue exactly,
+- collect pre-fix evidence,
+- identify root cause using tracing,
+- implement a minimal fix,
+- validate with the same repro sequence,
+- and prepare a clean commit.
 
-- `install.sh`: installer for the skill
-- `jira-issue-fixer-next/SKILL.md`: skill instructions
-- `jira-issue-fixer-next/agents/openai.yaml`: UI metadata
-- `jira-issue-fixer-next/references/debug_playbook.md`: detailed workflow + guardrails
-- `jira-issue-fixer-next/scripts/capture_repro_session.sh`: capture `session.log` and `timing.log`
-- `jira-issue-fixer-next/scripts/run_repro_menu_boot.sh`: wrapper for interactive repro automation
-- `jira-issue-fixer-next/scripts/repro_menu_boot.expect`: expect automation template
-- `jira-issue-fixer-next/scripts/repro_before_after_check.sh`: verify pre-fix failure exists and post-fix failure is gone
-- `jira-issue-fixer-next/scripts/detect_checkpatch_cmd.sh`: detect checker command for known repos
-- `jira-issue-fixer-next/scripts/patchcheck_wrapper.sh`: helper for edk2 PatchCheck usage
+## What the skill enforces
 
-## Clone
+The skill has hard gates (not optional):
+- Create a **dedicated local working branch first** (do not modify your current branch directly).
+- Capture **pre-fix** `session.log` and `timing.log` for interactive repro.
+- Do **pre-fix tracing** before any behavior change.
+- Do not implement fix until trace evidence identifies exact failing branch/path.
+- Capture **post-fix** logs using the same sequence.
+- Verify: pre-fix logs contain failure signature, post-fix logs do not.
+- Resolve checker command before check-in (user-provided or auto-detected).
+- Omit `Signed-off-by` in agent commits; user adds it after explicit final testing/signoff.
 
-SSH:
+## Repo contents
 
-```bash
-GIT_SSH_COMMAND='ssh -i ~/.ssh/slingappa_git/id_rsa -o IdentitiesOnly=yes' \
-git clone git@github.com:slingappa/jira-issue-fixer-skill.git
-cd jira-issue-fixer-skill
-```
-
-HTTPS:
-
-```bash
-git clone https://github.com/slingappa/jira-issue-fixer-skill.git
-cd jira-issue-fixer-skill
-```
+- `install.sh`
+- `jira-issue-fixer-next/SKILL.md`
+- `jira-issue-fixer-next/agents/openai.yaml`
+- `jira-issue-fixer-next/references/debug_playbook.md`
+- `jira-issue-fixer-next/scripts/capture_repro_session.sh`
+- `jira-issue-fixer-next/scripts/run_repro_menu_boot.sh`
+- `jira-issue-fixer-next/scripts/repro_menu_boot.expect`
+- `jira-issue-fixer-next/scripts/repro_before_after_check.sh`
+- `jira-issue-fixer-next/scripts/detect_checkpatch_cmd.sh`
+- `jira-issue-fixer-next/scripts/patchcheck_wrapper.sh`
 
 ## Install
 
 ```bash
+cd /path/to/jira-issue-fixer-skill
 ./install.sh --force
 ```
 
-Optional destination:
+Install to a custom location:
 
 ```bash
 ./install.sh --dest /path/to/skills --force
 ```
 
-## Recommended prompt template (final)
+## 60-second usage
+
+1. Give Jira URL/key.
+2. Give repo path(s).
+3. Give build command/script.
+4. Give exact runtime command.
+5. Give exact failing step sequence.
+6. (Optional) Give checker command if non-standard.
+7. Ask it to run unattended with trace-first gates.
+
+## Recommended prompt (copy/paste)
 
 ```text
 Use $jira-issue-fixer-next and run fully unattended end-to-end unless a mandatory gating input is missing.
@@ -79,8 +87,7 @@ Optional checker command:
 <CHECKER_CMD_IF_NON_STANDARD>
 
 Optional extra paths:
-- Artifact/runtime paths not embedded in command:
-  <EXTRA_ARTIFACT_OR_RUNTIME_PATHS>
+<EXTRA_ARTIFACT_OR_RUNTIME_PATHS>
 
 Exact failing sequence:
 1) <STEP_1>
@@ -88,38 +95,31 @@ Exact failing sequence:
 ...
 N) <STEP_N>
 
-Constraints and required behavior:
-- Before any debug/edit, create a dedicated local working branch and keep original branch untouched.
-- First capture pre-fix logs using script --timing:
-  - output dir: <LOG_OUTPUT_DIR>
-  - files: session.log, timing.log
-- Reproduce failure in pre-fix logs (mandatory).
-- Automate repro sequence and keep it deterministic.
-- Isolate root cause with minimal instrumentation.
-- MANDATORY pre-fix instrumentation tracing: trace a failing run before any functional fix.
-- Trace-first gate: do not implement fix until trace markers identify the exact failing branch/path.
-- In final report, include pre-fix trace evidence (failing function/path + reject reason) before root-cause statement.
+Required behavior:
+- Create a dedicated local working branch before any debug/edit.
+- Capture pre-fix session.log + timing.log for failing run.
+- Add pre-fix tracing and identify exact failing branch/path before any fix.
 - Implement minimal safe fix only.
-- Rebuild using provided build script.
-- Capture post-fix logs with the exact same sequence.
-- Run before/after signature check:
-  - pre-log must contain failure signature
-  - post-log must not contain failure signature
-- Confirm positive boot progression in post-fix logs.
-- Resolve checker automatically for known repos; if unresolved, ask before check-in.
-- If checker command is provided, use it instead of auto-detection.
-- Run checker and pass before check-in.
-- Create clean commit with Problem/Root cause/Fix (omit Signed-off-by).
-- User should explicitly run final test/signoff and add Signed-off-by themselves.
-- Keep temporary diagnostics out of final fix commit.
+- Capture post-fix session.log + timing.log with the same sequence.
+- Prove failure signature exists pre-fix and is absent post-fix.
+- Resolve checker and pass checker before check-in.
+- Omit Signed-off-by in agent commit; I will test/sign off explicitly after.
 - Do not modify unrelated files.
-- Treat provided commands/paths as authoritative; ask for path clarification only if missing/ambiguous.
 
-Expected final output:
-1) Root-cause summary
-2) Pre-fix trace evidence summary (function/path + reject reason)
+Final report must include:
+1) Pre-fix trace evidence (function/path + reject reason)
+2) Root cause tied to trace evidence
 3) Files changed
-4) Pre/post log paths and signature-check results
-5) Validation/build/checker results
+4) Pre/post log paths + signature check result
+5) Build/checker validation result
 6) Final commit hash
 ```
+
+## Notes
+
+- Commands/paths in the prompt are treated as authoritative.
+- The skill only asks for missing/ambiguous paths.
+- For known repos, checker can be auto-detected:
+  - edk2: `python3 BaseTools/Scripts/PatchCheck.py`
+  - Linux/U-Boot: `./scripts/checkpatch.pl --no-tree`
+  - Zephyr: `python3 scripts/ci/check_compliance.py`
