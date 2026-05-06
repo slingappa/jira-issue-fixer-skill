@@ -30,7 +30,19 @@ If checker is not provided:
 
 ## Workflow
 
+0. **Skill dependency preflight (mandatory)**
+- Use `jira-api` skill for Jira ingestion (fields/comments/attachments metadata).
+- If `jira-api` skill is not installed or unavailable:
+  - prompt user to install it first, then continue,
+  - recommend using `skill-installer` to install `jira-api`.
+- Do not proceed with unattended Jira intake until this dependency is resolved,
+  unless the user explicitly provides a full local Jira export.
+
 1. **Jira intake first (mandatory)**
+- Use `jira-api` skill to gather Jira fields before debugging:
+  - summary, description, acceptance criteria, environment, status/metadata,
+  - comments/history,
+  - attachment list and references.
 - Read the full Jira issue content before debugging:
   - summary, description, acceptance criteria, environment notes,
   - listed reproduction steps,

@@ -4,7 +4,7 @@ Installable Codex skill bundle: `jira-issue-fixer-next`.
 
 This skill is built for Jira issues that require strict reproducibility, trace-first root-cause analysis, and safe commit hygiene.
 
-Expectation from this skill is with a well crafted prompt with detailed precise reproduction steps, build instructions, skill should be able to fix the issue unattended.
+Expectation from this skill is with a well crafted prompt with detailed precise reproduction steps, build/execution instructions, skill should be able to fix the issue unattended after actually verifying the fix.
 
 ## Why this skill exists
 
@@ -49,6 +49,18 @@ Optional input:
 - checker command (if non-standard)
 - extra artifact/runtime paths not embedded in commands
 - failure signature regex and success signature regex
+
+## Jira API dependency (mandatory)
+
+- This skill expects `jira-api` skill to be available and uses it for Jira issue
+  field collection (description/comments/attachments metadata).
+- If `jira-api` is not installed, the agent must prompt to install it before
+  unattended execution.
+- Recommended install path:
+
+```bash
+Use $skill-installer to install jira-api skill.
+```
 
 ## Install
 
@@ -129,6 +141,8 @@ Exact failing sequence:
 N) <STEP_N>
 
 Mandatory behavior:
+- Use jira-api skill to fetch Jira fields/comments/attachments metadata first.
+- If jira-api skill is unavailable, stop and ask me to install it before continuing.
 - Read full Jira content first (description, repro, comments, attachments) and use it to drive repro/tracing.
 - Create a dedicated local working branch before any debug/edit.
 - Capture pre-fix failing run logs (session.log, timing.log for interactive flows).
