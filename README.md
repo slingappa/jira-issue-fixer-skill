@@ -116,6 +116,7 @@ git config alias.cs "commit -s"
 - `jira-issue-fixer-next/agents/openai.yaml`
 - `jira-issue-fixer-next/references/debug_playbook.md`
 - `jira-issue-fixer-next/references/hypothesis_matrix_template.md`
+- `jira-issue-fixer-next/references/commit_message_template.md`
 - `jira-issue-fixer-next/scripts/capture_repro_session.sh`
 - `jira-issue-fixer-next/scripts/run_repro_menu_boot.sh`
 - `jira-issue-fixer-next/scripts/repro_menu_boot.expect`
@@ -180,6 +181,7 @@ Mandatory behavior:
 - Capture state diff artifacts around trigger sequence when possible.
 - Prove failure signature exists pre-fix and is absent post-fix.
 - Resolve checker (provided or auto-detected), run checker, and pass before check-in.
+- Use commit message template with detailed sections and <= 75 char body lines.
 - Omit Signed-off-by in agent commit; I will do final test/signoff and add Signed-off-by myself.
 - Do not modify unrelated files.
 

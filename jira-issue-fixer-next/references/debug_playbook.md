@@ -81,6 +81,10 @@ Trace gate:
   - Fix
   - Validation
   - Risk
+- Use `references/commit_message_template.md` for section content/ordering.
+- Commit message must include concrete failure signature, repro trigger, and
+  trace branch evidence (not generic text).
+- Wrap commit body lines to <= 75 chars.
 - Do not add `Signed-off-by` in agent-created commits.
 - User performs final explicit test/signoff and adds signoff themselves.
 - Resolve checker command before check-in:

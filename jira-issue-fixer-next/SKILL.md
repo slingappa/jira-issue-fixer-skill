@@ -127,6 +127,12 @@ If checker is not provided:
 - Keep commit focused to minimal files.
 - Include Problem/Trigger Sequence/Trace Evidence/Root Cause/Fix/Validation/Risk
   sections in commit message.
+- Use mandatory template:
+  `references/commit_message_template.md`.
+- Commit message quality gate (mandatory):
+  - subject is specific and component-scoped,
+  - all required sections are present with concrete details,
+  - body line width <= 75 chars for checker compatibility.
 - Mandatory signoff rule:
   - do not add `Signed-off-by` in agent-created commits.
   - user must explicitly run their own final test/signoff flow and add signoff.
@@ -155,6 +161,7 @@ Return:
 ## References
 - Detailed playbook: [references/debug_playbook.md](references/debug_playbook.md)
 - Hypothesis matrix template: [references/hypothesis_matrix_template.md](references/hypothesis_matrix_template.md)
+- Commit message template: [references/commit_message_template.md](references/commit_message_template.md)
 
 ## Scripts
 - Repro capture helper: [scripts/capture_repro_session.sh](scripts/capture_repro_session.sh)
