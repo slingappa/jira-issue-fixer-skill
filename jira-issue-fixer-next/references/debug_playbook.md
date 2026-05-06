@@ -6,6 +6,9 @@
 - Confirm exact failing sequence and direct-success sequence.
 
 ## B. Repro Automation Strategy
+- For interactive failures, first capture `session.log` and `timing.log` using:
+  - `script --timing=timing.log -q session.log -c \"<runtime command>\"`
+- Use captured logs to tune menu navigation offsets/timing before code changes.
 - Use deterministic automation for menu-driven flows.
 - Start with user-provided keysteps; tune menu offsets only as needed.
 - Parameterize key counts and timing via env vars.

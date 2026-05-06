@@ -25,6 +25,8 @@ If any are missing, ask explicitly.
 
 2. **Reproduce first**
 - Reproduce manually once with user-provided sequence.
+- For interactive flows, first capture `session.log` and `timing.log` using
+  `script --timing` (use `scripts/capture_repro_session.sh`).
 - For interactive flows, immediately automate with `scripts/repro_menu_boot.expect` + wrapper.
 - Ensure deterministic pass/fail exit code and log file.
 
@@ -55,12 +57,14 @@ Return:
 2. Root cause statement
 3. Exact files changed
 4. Validation evidence
-5. Commit hash + patch-check result
+5. Paths to captured `session.log` and `timing.log` (for interactive repro)
+6. Commit hash + patch-check result
 
 ## References
 - Detailed playbook: [references/debug_playbook.md](references/debug_playbook.md)
 
 ## Scripts
+- Repro capture helper: [scripts/capture_repro_session.sh](scripts/capture_repro_session.sh)
 - Repro automation wrapper: [scripts/run_repro_menu_boot.sh](scripts/run_repro_menu_boot.sh)
 - Interactive expect flow: [scripts/repro_menu_boot.expect](scripts/repro_menu_boot.expect)
 - PatchCheck helper: [scripts/patchcheck_wrapper.sh](scripts/patchcheck_wrapper.sh)
