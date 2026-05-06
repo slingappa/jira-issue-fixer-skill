@@ -58,18 +58,53 @@ Optional destination:
 ## Recommended prompt template
 
 ```text
-Use $jira-issue-fixer-next.
-Jira: <JIRA_URL_OR_KEY>
-Repos: <ABS_PATHS>
-Build script: <ABS_PATH>
-Run command: <EXACT_RUNTIME_CMD>
-Repro steps: <NUMBERED_STEPS>
-Checker: <OPTIONAL_CHECKER_CMD_IF_NON_STANDARD>
-Capture `session.log` and `timing.log` using script --timing before automation.
-Capture post-fix `session.log` and `timing.log` with same sequence and prove failure signature is gone.
-Reproduce first, automate repro, isolate root cause with minimal instrumentation,
-implement minimal fix, validate with same repro path, and commit cleanly.
-```
+Use $jira-issue-fixer-next and run fully unattended end-to-end unless a mandatory gating input is missing.
 
-If checker is not provided, the skill auto-detects for known repos (Linux, edk2,
-U-Boot, Zephyr). If still unresolved, it should ask before check-in/commit.
+Jira:
+<JIRA_URL_OR_KEY>
+
+Primary repo:
+<PRIMARY_REPO_PATH>
+
+Build workspace:
+<BUILD_WORKSPACE_PATH>
+
+Build script:
+<BUILD_SCRIPT_PATH>
+
+Runtime command:
+<EXACT_RUNTIME_COMMAND>
+
+Exact failing sequence:
+1) <STEP_1>
+2) <STEP_2>
+...
+N) <STEP_N>
+
+Constraints and required behavior:
+- First capture pre-fix logs using script --timing:
+  - output dir: <LOG_OUTPUT_DIR>
+  - files: session.log, timing.log
+- Reproduce failure in pre-fix logs (mandatory).
+- Automate repro sequence and keep it deterministic.
+- Isolate root cause with minimal instrumentation.
+- Implement minimal safe fix only.
+- Rebuild using provided build script.
+- Capture post-fix logs with the exact same sequence.
+- Run before/after signature check:
+  - pre-log must contain failure signature
+  - post-log must not contain failure signature
+- Confirm positive boot progression in post-fix logs.
+- Resolve checker automatically for known repos; if unresolved, ask before check-in.
+- Run checker and pass before check-in.
+- Create clean commit with Problem/Root cause/Fix and Signed-off-by.
+- Keep temporary diagnostics out of final fix commit.
+- Do not modify unrelated files.
+
+Expected final output:
+1) Root-cause summary
+2) Files changed
+3) Pre/post log paths and signature-check results
+4) Validation/build/checker results
+5) Final commit hash
+```
