@@ -14,15 +14,15 @@ High-level methodology used by this skill:
 2. Safe working setup:
    create a dedicated local branch and verify build/runtime paths match the image under test.
 3. Deterministic reproduction:
-   capture pre-fix evidence (`session.log`/`timing.log`) and establish reproducibility with multi-run failure-rate checks.
+   capture pre-fix evidence (`session.log`/`timing.log`) and establish reproducibility scoring with multi-run checks (default >=3 runs, target pre-fix failure rate >= 0.67).
 4. Trace-first root cause isolation:
-   run two-pass instrumentation (broad path map, then exact reject branch), and complete a 3-hypothesis matrix before coding.
+   run multi-pass instrumentation operations (mandatory two-pass tracing: broad path map, then exact reject branch/condition proof), and complete a 3-hypothesis matrix before coding.
 5. Minimal, evidence-driven fix:
    implement only the change required to remove the proven reject path while preserving existing safety checks.
 6. Same-path validation:
-   rebuild, replay the same sequence, prove failure signature removal, and run post-fix multi-run stability + negative-path checks.
+   rebuild, replay the same sequence, prove failure signature removal, and run post-fix reproducibility scoring (default >=3 runs, target post-fix failure rate == 0.00) plus negative-path checks.
 7. Commit and quality gates:
-   run repo checker, generate quality score/readiness report, and produce focused commit metadata for user-owned final signoff.
+   run repo checker, compute gate-based confidence scoring (`quality_gate_report.sh`) with ready/not-ready output, and produce focused commit metadata for user-owned final signoff.
 
 ## Why this skill exists
 
