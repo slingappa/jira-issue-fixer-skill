@@ -89,6 +89,7 @@ Exact failing sequence:
 N) <STEP_N>
 
 Constraints and required behavior:
+- Before any debug/edit, create a dedicated local working branch and keep original branch untouched.
 - First capture pre-fix logs using script --timing:
   - output dir: <LOG_OUTPUT_DIR>
   - files: session.log, timing.log

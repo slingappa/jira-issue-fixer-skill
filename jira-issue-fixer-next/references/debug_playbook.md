@@ -1,6 +1,8 @@
 # Debug Playbook (Interactive Firmware/Boot Issues)
 
 ## A. Context Integrity
+- Create a dedicated local working branch before any debug/edit action.
+- Keep user's original branch untouched during skill execution.
 - Confirm the runtime image path and build output are the same file.
 - Confirm branch/reset state before assuming previous fixes exist.
 - Confirm exact failing sequence and direct-success sequence.

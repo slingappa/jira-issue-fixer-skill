@@ -29,6 +29,10 @@ If checker is not provided:
 ## Workflow
 
 1. **Baseline and alignment**
+- **MANDATORY branch safety rule (pre-fix)**:
+  - create/use a dedicated local working branch before any instrumentation,
+    build, or code edits,
+  - do not modify the user's current branch directly.
 - Verify active repo(s) are the ones used by runtime image.
 - Verify build output path used by runtime command.
 - Record the exact failure signature.
