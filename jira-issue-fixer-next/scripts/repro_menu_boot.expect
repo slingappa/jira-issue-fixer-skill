@@ -1,0 +1,98 @@
+#!/usr/bin/expect -f
+
+# Generic interactive boot-menu repro template.
+# Required:
+#   REPRO_CMD
+# Optional:
+#   REPRO_LOG (default /tmp/repro-menu-boot.log)
+#   BOOT_PROMPT_RE (default "Press ESCAPE for boot options")
+#   BOOT_MENU_DOWN (default 2)
+#   SHELL_MENU_DOWN (default 0)
+#   TARGET_MENU_DOWN (default 1)
+#   MENU_SETTLE_MS (default 1400)
+
+proc getenv_default {name def} {
+  if {[info exists ::env($name)] && $::env($name) ne ""} {
+    return $::env($name)
+  }
+  return $def
+}
+
+proc send_down {count} {
+  for {set i 0} {$i < $count} {incr i} {
+    send -- "\033\[B"
+    after 200
+  }
+}
+
+set timeout -1
+set cmd [getenv_default "REPRO_CMD" ""]
+if {$cmd eq ""} {
+  puts stderr "REPRO_CMD is empty"
+  exit 2
+}
+
+set log_path [getenv_default "REPRO_LOG" "/tmp/repro-menu-boot.log"]
+set boot_prompt_re [getenv_default "BOOT_PROMPT_RE" "Press ESCAPE for boot options"]
+set bm_down [expr {[getenv_default "BOOT_MENU_DOWN" "2"] + 0}]
+set shell_down [expr {[getenv_default "SHELL_MENU_DOWN" "0"] + 0}]
+set target_down [expr {[getenv_default "TARGET_MENU_DOWN" "1"] + 0}]
+set settle_ms [expr {[getenv_default "MENU_SETTLE_MS" "1400"] + 0}]
+
+log_file -a $log_path
+puts "REPRO: log=$log_path"
+spawn bash -lc $cmd
+
+expect {
+  -re $boot_prompt_re {
+    puts "REPRO: boot prompt seen; sending ESC"
+    send -- "\033"
+  }
+  timeout {
+    puts "REPRO: timeout waiting for boot prompt"
+    exit 3
+  }
+}
+
+after $settle_ms
+send -- "\t"
+after 200
+send -- "\t"
+after 200
+send_down $bm_down
+send -- "\r"
+puts "REPRO: entered boot manager"
+
+after $settle_ms
+send_down $shell_down
+send -- "\r"
+puts "REPRO: entered shell"
+
+expect {
+  -re {Shell>} {}
+  timeout {}
+}
+
+send -- "exit\r"
+puts "REPRO: exited shell"
+
+after $settle_ms
+send_down $target_down
+send -- "\r"
+puts "REPRO: selected target option"
+
+set timeout 180
+expect {
+  -re {Memory starting at .*marked as free, but EFI would not allocate} {
+    puts "REPRO: FAILURE signature observed"
+    exit 10
+  }
+  -re {Aborted\. Press any key to exit\.} {
+    puts "REPRO: abort observed"
+    exit 11
+  }
+  timeout {
+    puts "REPRO: no failure signature within timeout"
+    exit 0
+  }
+}

@@ -1,0 +1,33 @@
+# Debug Playbook (Interactive Firmware/Boot Issues)
+
+## A. Context Integrity
+- Confirm the runtime image path and build output are the same file.
+- Confirm branch/reset state before assuming previous fixes exist.
+- Confirm exact failing sequence and direct-success sequence.
+
+## B. Repro Automation Strategy
+- Use deterministic automation for menu-driven flows.
+- Start with user-provided keysteps; tune menu offsets only as needed.
+- Parameterize key counts and timing via env vars.
+- Keep logs in one stable location for grep-based signature checks.
+
+## C. Instrumentation Ladder
+1. Add branch tags around suspected reject paths.
+2. If DEBUG output is hidden, use serial writes.
+3. Narrow to one branch reason before changing behavior.
+
+## D. Fix Strategy
+- Prefer preflight validation + existing execution path over large rewrites.
+- Preserve safety checks; remove only false reject gates.
+- Keep change set minimal and reviewable.
+
+## E. Validation Bar
+- Same failing sequence must now pass.
+- Signature must disappear from logs.
+- Positive path must continue (boot progression observed).
+
+## F. Commit Standards
+- One focused commit per logical fix.
+- Message sections: Problem / Root cause / Fix.
+- Include Signed-off-by when policy requires.
+- Run patch checker and report outcome.

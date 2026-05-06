@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira Issue Fixer Next"
+  short_description: "Reproduce, debug, fix, validate, and commit Jira issues"
+  default_prompt: "Use $jira-issue-fixer-next to reproduce a Jira issue, isolate root cause, implement a minimal fix, validate with scripted repro, and prepare a clean commit."
