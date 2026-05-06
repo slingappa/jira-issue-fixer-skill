@@ -6,6 +6,24 @@ This skill is built for Jira issues that require strict reproducibility, trace-f
 
 Expectation from this skill is with a well crafted prompt with detailed precise reproduction steps, build/execution instructions, skill should be able to fix the issue unattended after actually verifying the fix.
 
+## Overview
+
+High-level methodology used by this skill:
+1. Jira intake first:
+   collect issue fields/comments/attachments via `jira-api` and extract failure signatures, repro details, and constraints.
+2. Safe working setup:
+   create a dedicated local branch and verify build/runtime paths match the image under test.
+3. Deterministic reproduction:
+   capture pre-fix evidence (`session.log`/`timing.log`) and establish reproducibility with multi-run failure-rate checks.
+4. Trace-first root cause isolation:
+   run two-pass instrumentation (broad path map, then exact reject branch), and complete a 3-hypothesis matrix before coding.
+5. Minimal, evidence-driven fix:
+   implement only the change required to remove the proven reject path while preserving existing safety checks.
+6. Same-path validation:
+   rebuild, replay the same sequence, prove failure signature removal, and run post-fix multi-run stability + negative-path checks.
+7. Commit and quality gates:
+   run repo checker, generate quality score/readiness report, and produce focused commit metadata for user-owned final signoff.
+
 ## Why this skill exists
 
 Many issue-fixing attempts fail because they skip one of these:
