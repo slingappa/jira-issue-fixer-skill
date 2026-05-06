@@ -14,6 +14,13 @@ Collect these before implementation:
 5. Exact numbered repro sequence
 6. Expected vs observed behavior
 7. Optional: checker command if repo uses non-standard patch checker
+8. Optional: extra artifact/runtime paths (if not already embedded in commands)
+
+## Path Policy
+- Treat user-provided commands and paths as authoritative.
+- Assume commands include required absolute paths when provided that way.
+- Accept additional artifact/runtime paths from prompt and use them directly.
+- Ask for path clarification only when required paths are missing or ambiguous.
 
 If checker is not provided:
 - Try auto-detection with `scripts/detect_checkpatch_cmd.sh`.

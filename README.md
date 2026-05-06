@@ -75,6 +75,10 @@ Build script:
 Runtime command:
 <EXACT_RUNTIME_COMMAND>
 
+Optional extra paths:
+- Artifact/runtime paths not embedded in command:
+  <EXTRA_ARTIFACT_OR_RUNTIME_PATHS>
+
 Exact failing sequence:
 1) <STEP_1>
 2) <STEP_2>
@@ -100,6 +104,7 @@ Constraints and required behavior:
 - Create clean commit with Problem/Root cause/Fix and Signed-off-by.
 - Keep temporary diagnostics out of final fix commit.
 - Do not modify unrelated files.
+- Treat provided commands/paths as authoritative; ask for path clarification only if missing/ambiguous.
 
 Expected final output:
 1) Root-cause summary
